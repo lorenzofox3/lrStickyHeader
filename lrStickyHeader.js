@@ -48,28 +48,24 @@
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var classes = this.thead.className.split(' ');
 
-      if (this.stick !== true) {
-        if (offsetTop - window.scrollY < 0) {
-          this.stick = true;
-          this.treshold = offsetTop;
-          this.setWidth();
-          this.thead.style.left = offsetLeft + 'px';
-          this.thead.style.top = 0;
-          setTimeout(function () {
-            classes.push('lr-sticky-header');
-            this.thead.style.position = 'fixed';
-            this.thead.className = classes.join(' ');
-          }.bind(this), 0)
-        }
+      if (this.stick !== true && (offsetTop - window.scrollY < 0)) {
+        this.stick = true;
+        this.treshold = offsetTop;
+        this.setWidth();
+        this.thead.style.left = offsetLeft + 'px';
+        this.thead.style.top = 0;
+        setTimeout(function () {
+          classes.push('lr-sticky-header');
+          this.thead.style.position = 'fixed';
+          this.thead.className = classes.join(' ');
+        }.bind(this), 0);
       }
 
-      if (this.stick === true) {
-        if (this.treshold - window.scrollY > 0) {
-          this.stick = false;
-          this.thead.style.position = 'initial';
-          classes.splice(classes.indexOf('lr-sticky-header'), 1);
-          this.thead.className = (classes).join(' ');
-        }
+      if (this.stick === true && (this.treshold - window.scrollY > 0)) {
+        this.stick = false;
+        this.thead.style.position = 'initial';
+        classes.splice(classes.indexOf('lr-sticky-header'), 1);
+        this.thead.className = (classes).join(' ');
       }
     }
   };
@@ -81,9 +77,9 @@
     if (tableElement.tagName !== 'TABLE') {
       throw new Error('lrStickyHeader only works on table element');
     }
-
     tbody = tableElement.getElementsByTagName('TBODY');
     thead = tableElement.getElementsByTagName('THEAD');
+
     if (!thead.length) {
       throw new Error('could not find the thead group element');
     }
@@ -118,6 +114,5 @@
 
     return stickyTable;
   };
-
 });
 

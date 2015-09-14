@@ -1,0 +1,23 @@
+{
+  "name": "lr-sticky-header",
+  "main": "lrStickyHeader.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/lorenzofox3/lrStickyHeader",
+  "authors": [
+    "lorenzofox3 <laurent34azerty@gmail.com>"
+  ],
+  "description": "make table header sticky",
+  "keywords": [
+    "table",
+    "header",
+    "sticky"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "lr-sticky-header",
+  "version": "1.0.0",
+  "description": "make table header sticky",
+  "main": "lrStickyHeader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lorenzofox3/lrStickyHeader.git"
+  },
+  "keywords": [
+    "table",
+    "sticky",
+    "header"
+  ],
+  "author": "laurent renard",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lorenzofox3/lrStickyHeader/issues"
+  },
+  "homepage": "https://github.com/lorenzofox3/lrStickyHeader#readme"
+}

@@ -1,4 +1,18 @@
-(function (window) {
+(function (global, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module unless amdModuleId is set
+    define([], function () {
+      return (global['lrStickyHeader'] = factory(global));
+    });
+  } else if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(global);
+  } else {
+    global['lrStickyHeader'] = factory(global);
+  }
+})(window, function factory (window) {
   'use strict';
   function getOffset (element, property) {
     var offset = element[property];
@@ -8,7 +22,9 @@
     }
     return offset;
   }
+
   var sticky = {
+    //todo some memoize stuff
     setWidth: function setWidth () {
       var firstRow = this.tbody.getElementsByTagName('TR')[0];
       var trh = this.thead.getElementsByTagName('TR')[0];
@@ -58,7 +74,8 @@
       }
     }
   };
-  function lrStickyHeader (tableElement) {
+
+  return function lrStickyHeader (tableElement) {
     var thead;
     var tbody;
 
@@ -94,9 +111,14 @@
       }
     });
 
-    window.addEventListener('scroll', stickyTable.eventListener.bind(stickyTable));
+    var listener = stickyTable.eventListener.bind(stickyTable);
+    window.addEventListener('scroll', listener);
+    stickyTable.clean = function clean () {
+      window.removeEventListener('scroll', listener);
+    };
 
     return stickyTable;
-  }
-  window.lrStickyHeader = lrStickyHeader;
-})(window);
+  };
+
+});
+

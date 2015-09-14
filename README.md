@@ -28,12 +28,12 @@ var stickyTable = lrStickyHeader(tableElement);
 
 You'll need your table element and its children to have the property ``box-sizing`` set to ``border-box`` (it is the default of many css framework such bootstrap
 
-when the header is sticked the class name ``lr-sticky-header`` if you want to add some more style that
+when the header is sticked the class name ``lr-sticky-header`` is added to the thead element if you want to add some more style
 
 ### api
 
-* ~ setWidth(): if you want to call manually the resize of the column (within a resize event handler for example)
-* ~ clean(): to detach the scroll event handler from the window
+*  **setWidth()** : if you want to call manually the resize of the column (within a resize event handler for example)
+*  **clean()** ~: to detach the scroll event handler from the window
 
 ### example of a directive with [smart-table](http://lorenzofox3.github.io/smart-table-website/)
 

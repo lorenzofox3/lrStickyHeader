@@ -31,17 +31,16 @@
       var firstTds;
       var firstThs;
 
+      function setCellWidth (cell) {
+        cell.style.width = cell.offsetWidth + 'px';
+      }
+
       if (firstRow && trh) {
         firstTds = firstRow.getElementsByTagName('TD');
         firstThs = trh.getElementsByTagName('TH');
 
-        [].forEach.call(firstTds, function (td) {
-          td.style.width = td.offsetWidth + 'px';
-        });
-
-        [].forEach.call(firstThs, function (th) {
-          th.style.width = th.offsetWidth + 'px';
-        });
+        [].forEach.call(firstTds, setCellWidth);
+        [].forEach.call(firstThs, setCellWidth);
       }
     },
     eventListener: function eventListener () {

@@ -6,6 +6,11 @@ make table headers sticky
 
 [live demo](http://lorenzofox3.github.io/lrStickyHeader/example.html)
 
+* (almost)no css to add 
+* no dependency
+* does not add any other element to the markup
+* ~ 100 loc
+
 ## install 
 
 ``bower install lr-sticky-header``

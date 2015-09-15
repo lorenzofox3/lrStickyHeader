@@ -1,6 +1,6 @@
 # lrStickyHeader
 
-make table headers sticky 
+make table headers sticky, example for [React CRM](http://reactcrm.com/)
 
 ![stStickeyHeader](http://i.imgur.com/ocN250H.gif)
 

@@ -44,12 +44,12 @@
       }
     },
     eventListener: function eventListener () {
-      var offsetTop = this.offsetTopOverride ? this.offsetTopOverride : getOffset(this.thead, 'offsetTop');
-      var offsetLeft = getOffset(this.thead, 'offsetLeft');
-      var classes = this.thead.className.split(' ');
+      var offsetTop      = this.offsetTopOverride ? this.offsetTopOverride : getOffset(this.thead, 'offsetTop');
+      var offsetLeft     = getOffset(this.thead, 'offsetLeft');
+      var classes        = this.thead.className.split(' ');
+      var scrollPosition = this.isWindowScroll ? this.scrollContainer.scrollY : this.scrollContainer.scrollTop;
 
-      if (this.stick !== true) {
-        var scrollPosition = this.isWindowScroll ? this.scrollContainer.scrollY : this.scrollContainer.scrollTop;
+      if (this.stick !== true && (offsetTop - scrollPosition < 0)) {
         if (offsetTop - scrollPosition < 0) {
           this.stick = true;
           this.treshold = offsetTop;
@@ -64,8 +64,7 @@
         }
       }
 
-      if (this.stick === true) {
-        var scrollPosition = this.isWindowScroll ? this.scrollContainer.scrollY : this.scrollContainer.scrollTop;
+      if (this.stick === true && (this.treshold - scrollPosition > 0)) {
         if (this.treshold - scrollPosition > 0) {
           this.stick = false;
           this.thead.style.position = 'initial';

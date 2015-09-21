@@ -44,42 +44,54 @@
       }
     },
     eventListener: function eventListener () {
-      var offsetTop = getOffset(this.thead, 'offsetTop');
+      var offsetTop = this.offsetTopOverride ? this.offsetTopOverride : getOffset(this.thead, 'offsetTop');
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var classes = this.thead.className.split(' ');
 
-      if (this.stick !== true && (offsetTop - window.scrollY < 0)) {
-        this.stick = true;
-        this.treshold = offsetTop;
-        this.setWidth();
-        this.thead.style.left = offsetLeft + 'px';
-        this.thead.style.top = 0;
-        setTimeout(function () {
-          classes.push('lr-sticky-header');
-          this.thead.style.position = 'fixed';
-          this.thead.className = classes.join(' ');
-        }.bind(this), 0);
+      if (this.stick !== true) {
+        var scrollPosition = this.isWindowScroll ? this.scrollContainer.scrollY : this.scrollContainer.scrollTop;
+        if (offsetTop - scrollPosition < 0) {
+          this.stick = true;
+          this.treshold = offsetTop;
+          this.setWidth();
+          this.thead.style.left = offsetLeft + 'px';
+          this.thead.style.top = this.isWindowScroll ? 0 : this.scrollContainer.getBoundingClientRect().top + 'px';
+          setTimeout(function () {
+            classes.push('lr-sticky-header');
+            this.thead.style.position = 'fixed';
+            this.thead.className = classes.join(' ');
+          }.bind(this), 0);
+        }
       }
 
-      if (this.stick === true && (this.treshold - window.scrollY > 0)) {
-        this.stick = false;
-        this.thead.style.position = 'initial';
-        classes.splice(classes.indexOf('lr-sticky-header'), 1);
-        this.thead.className = (classes).join(' ');
+      if (this.stick === true) {
+        var scrollPosition = this.isWindowScroll ? this.scrollContainer.scrollY : this.scrollContainer.scrollTop;
+        if (this.treshold - scrollPosition > 0) {
+          this.stick = false;
+          this.thead.style.position = 'initial';
+          classes.splice(classes.indexOf('lr-sticky-header'), 1);
+          this.thead.className = (classes).join(' ');
+        }
       }
     }
   };
 
-  return function lrStickyHeader (tableElement) {
+  return function lrStickyHeader (tableElement, options) {
+    options                   = options || {};
+    options.scrollContainer   = options.scrollContainer || window;
+    options.offsetTopOverride = options.offsetTopOverride || null;
+
+    var isWindowScroll = options.scrollContainer === window;
+
     var thead;
     var tbody;
 
     if (tableElement.tagName !== 'TABLE') {
       throw new Error('lrStickyHeader only works on table element');
     }
+
     tbody = tableElement.getElementsByTagName('TBODY');
     thead = tableElement.getElementsByTagName('THEAD');
-
     if (!thead.length) {
       throw new Error('could not find the thead group element');
     }
@@ -91,9 +103,11 @@
     thead = thead[0];
     tbody = tbody[0];
 
-
     var stickyTable = Object.create(sticky, {
       element: {value: tableElement},
+      scrollContainer: { value: options.scrollContainer },
+      isWindowScroll: { value: isWindowScroll },
+      offsetTopOverride: { value: options.offsetTopOverride },
       thead: {
         get: function () {
           return thead;
@@ -107,12 +121,11 @@
     });
 
     var listener = stickyTable.eventListener.bind(stickyTable);
-    window.addEventListener('scroll', listener);
+    options.scrollContainer.addEventListener('scroll', listener);
     stickyTable.clean = function clean () {
-      window.removeEventListener('scroll', listener);
+      options.scrollContainer.removeEventListener('scroll', listener);
     };
 
     return stickyTable;
   };
 });
-

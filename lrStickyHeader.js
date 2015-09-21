@@ -50,27 +50,23 @@
       var scrollPosition = this.isWindowScroll ? this.scrollContainer.scrollY : this.scrollContainer.scrollTop;
 
       if (this.stick !== true && (offsetTop - scrollPosition < 0)) {
-        if (offsetTop - scrollPosition < 0) {
-          this.stick = true;
-          this.treshold = offsetTop;
-          this.setWidth();
-          this.thead.style.left = offsetLeft + 'px';
-          this.thead.style.top = this.isWindowScroll ? 0 : this.scrollContainer.getBoundingClientRect().top + 'px';
-          setTimeout(function () {
-            classes.push('lr-sticky-header');
-            this.thead.style.position = 'fixed';
-            this.thead.className = classes.join(' ');
-          }.bind(this), 0);
-        }
+        this.stick = true;
+        this.treshold = offsetTop;
+        this.setWidth();
+        this.thead.style.left = offsetLeft + 'px';
+        this.thead.style.top = this.isWindowScroll ? 0 : this.scrollContainer.getBoundingClientRect().top + 'px';
+        setTimeout(function () {
+          classes.push('lr-sticky-header');
+          this.thead.style.position = 'fixed';
+          this.thead.className = classes.join(' ');
+        }.bind(this), 0);
       }
 
       if (this.stick === true && (this.treshold - scrollPosition > 0)) {
-        if (this.treshold - scrollPosition > 0) {
-          this.stick = false;
-          this.thead.style.position = 'initial';
-          classes.splice(classes.indexOf('lr-sticky-header'), 1);
-          this.thead.className = (classes).join(' ');
-        }
+        this.stick = false;
+        this.thead.style.position = 'initial';
+        classes.splice(classes.indexOf('lr-sticky-header'), 1);
+        this.thead.className = (classes).join(' ');
       }
     }
   };

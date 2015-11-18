@@ -44,7 +44,7 @@
       }
     },
     eventListener: function eventListener () {
-      var offsetTop = getOffset(this.thead, 'offsetTop');
+      var offsetTop = getOffset(this.thead, 'offsetTop') - Number(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var classes = this.thead.className.split(' ');
 
@@ -53,7 +53,7 @@
         this.treshold = offsetTop;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
-        this.thead.style.top = 0;
+        this.thead.style.top = Number(this.headerHeight) + 'px';
         setTimeout(function () {
           classes.push('lr-sticky-header');
           this.thead.style.position = 'fixed';
@@ -70,7 +70,11 @@
     }
   };
 
-  return function lrStickyHeader (tableElement) {
+  return function lrStickyHeader (tableElement, options) {
+    var headerHeight = 0;
+    if (options&&options.headerHeight)
+      headerHeight=options.headerHeight;
+
     var thead;
     var tbody;
 
@@ -94,6 +98,11 @@
 
     var stickyTable = Object.create(sticky, {
       element: {value: tableElement},
+      headerHeight: {
+        get: function () {
+          return headerHeight;
+        }
+      },
       thead: {
         get: function () {
           return thead;

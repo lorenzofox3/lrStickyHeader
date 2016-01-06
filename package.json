@@ -1,6 +1,6 @@
 {
   "name": "lr-sticky-header",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "make table header sticky",
   "main": "lrStickyHeader.js",
   "scripts": {

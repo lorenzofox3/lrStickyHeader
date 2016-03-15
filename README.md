@@ -46,14 +46,10 @@ when the header is sticked the class name ``lr-sticky-header`` is added to the t
   angular.directive('stStickyHeader', ['$window', function ($window) {
     return {
       require: '^?stTable',
-      link: function (scope, element, attr, ctrl) {
-        var customTopVal = element[0].attributes[1].nodeValue; 
-        var  options = {
-            headerHeight:customTopVal
-          };
+      link: function (scope, element, attr, ctrl) {      
         //used settimeout such that it will support for mulitple smart tables it will wait until it finds element[0].
         setTimeout(function () {
-        var stickyHeader = lrStickyHeader(element[0], options);
+        var stickyHeader = lrStickyHeader(element[0], {headerHeight: attr.stStickyHeaderTop});
             scope.$on('$destroy', function () {
             stickyHeader.clean();
             });
@@ -65,13 +61,13 @@ when the header is sticked the class name ``lr-sticky-header`` is added to the t
           $window.scrollTo(0, lrStickyHeader.treshold);
         }, true)
          
-         // The below give fix while resize window in all browsers
+         // The below code is a fix for resize window in all browsers
          angular.element($window).on("resize", function(){
             //stickyHeader.clean();
             angular.element(element[0]).find('thead').removeAttr('style');
             angular.element(element[0]).find('thead').removeClass('lr-sticky-header');
             $window.scrollTo(0, lrStickyHeader.treshold);
-              var stickyHeader = lrStickyHeader(element[0], options);
+              var stickyHeader = lrStickyHeader(element[0], {headerHeight: attr.stStickyHeaderTop});
          });
       }
     }

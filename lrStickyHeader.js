@@ -27,33 +27,51 @@
     //todo some memoize stuff
     setWidth: function setWidth () {
       var firstRow = this.tbody.getElementsByTagName('TR')[0];
-      var trh = this.thead.getElementsByTagName('TR')[0];
+      var trLength = this.thead.getElementsByTagName('TR').length;
+      var trCollection=[];
+      for(var i=0; i<trLength; i++){
+        trCollection[i]=this.thead.getElementsByTagName('TR')[i];
+      }
       var firstTds;
-      var firstThs;
 
       function setCellWidth (cell) {
         cell.style.width = cell.offsetWidth + 'px';
       }
 
-      if (firstRow && trh) {
+      if (firstRow) {
         firstTds = firstRow.getElementsByTagName('TD');
-        firstThs = trh.getElementsByTagName('TH');
+        var trTdCollection = [];
+        for(var j=0; j<trCollection.length; j++){
+          //to check the length of the TD and TH length 
+          var elementByTD = trCollection[j].getElementsByTagName('TD'); 
+          var elementByTH = trCollection[j].getElementsByTagName('TH');
+          if(elementByTD.length>0){
+            trTdCollection[j]=trCollection[j].getElementsByTagName('TD');
+          }else if(elementByTH.length>0){
+            trTdCollection[j]=trCollection[j].getElementsByTagName('TH');
+          }
+        }
 
         [].forEach.call(firstTds, setCellWidth);
-        [].forEach.call(firstThs, setCellWidth);
+        for(var k=0;k<trTdCollection.length;k++){
+           [].forEach.call(trTdCollection[k], setCellWidth);
+        }
       }
     },
     eventListener: function eventListener () {
       var offsetTop = getOffset(this.thead, 'offsetTop') - Number(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var classes = this.thead.className.split(' ');
-
-      if (this.stick !== true && (offsetTop - window.scrollY < 0)) {
+      //below line will support for multiple browsers
+      var scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (this.stick !== true && (offsetTop - scrollPosition < 0)) {
         this.stick = true;
         this.treshold = offsetTop;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
         this.thead.style.top = Number(this.headerHeight) + 'px';
+        this.tbody.className = this.tBodyCls;
         setTimeout(function () {
           classes.push('lr-sticky-header');
           this.thead.style.position = 'fixed';
@@ -61,9 +79,10 @@
         }.bind(this), 0);
       }
 
-      if (this.stick === true && (this.treshold - window.scrollY > 0)) {
+      if (this.stick === true && (this.treshold - scrollPosition > 0)) {
         this.stick = false;
-        this.thead.style.position = 'initial';
+        this.tbody.className = '';
+        this.thead.style.position = 'static';
         classes.splice(classes.indexOf('lr-sticky-header'), 1);
         this.thead.className = (classes).join(' ');
       }
@@ -72,8 +91,12 @@
 
   return function lrStickyHeader (tableElement, options) {
     var headerHeight = 0;
+    var tBodyCls = '';
     if (options&&options.headerHeight)
       headerHeight=options.headerHeight;
+    
+    if (options&&options.tBodyCls)
+      tBodyCls = options.tBodyCls;
 
     var thead;
     var tbody;
@@ -111,6 +134,11 @@
       tbody: {
         get: function () {
           return tbody;
+        }
+      },
+      tBodyCls: {
+        get: function() {
+          return tBodyCls;
         }
       }
     });

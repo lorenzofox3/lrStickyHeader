@@ -71,6 +71,7 @@
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
         this.thead.style.top = Number(this.headerHeight) + 'px';
+        this.tbody.className = this.tBodyCls;
         setTimeout(function () {
           classes.push('lr-sticky-header');
           this.thead.style.position = 'fixed';
@@ -80,7 +81,8 @@
 
       if (this.stick === true && (this.treshold - scrollPosition > 0)) {
         this.stick = false;
-        this.thead.style.position = 'initial';
+        this.tbody.className = '';
+        this.thead.style.position = 'static';
         classes.splice(classes.indexOf('lr-sticky-header'), 1);
         this.thead.className = (classes).join(' ');
       }
@@ -89,8 +91,12 @@
 
   return function lrStickyHeader (tableElement, options) {
     var headerHeight = 0;
+    var tBodyCls = '';
     if (options&&options.headerHeight)
       headerHeight=options.headerHeight;
+    
+    if (options&&options.tBodyCls)
+      tBodyCls = options.tBodyCls;
 
     var thead;
     var tbody;
@@ -128,6 +134,11 @@
       tbody: {
         get: function () {
           return tbody;
+        }
+      },
+      tBodyCls: {
+        get: function() {
+          return tBodyCls;
         }
       }
     });

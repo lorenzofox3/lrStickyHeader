@@ -1,7 +1,7 @@
-(function (global, factory) {
+(function(global, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define([], function () {
+    define([], function() {
       return (global['lrStickyHeader'] = factory(global));
     });
   } else if (typeof exports === 'object') {
@@ -12,9 +12,10 @@
   } else {
     global['lrStickyHeader'] = factory(global);
   }
-})(window, function factory (window) {
+})(window, function factory(window) {
   'use strict';
-  function getOffset (element, property) {
+
+  function getOffset(element, property) {
     var offset = element[property];
     var parent = element;
     while ((parent = parent.offsetParent) !== null) {
@@ -25,13 +26,13 @@
 
   var sticky = {
     //todo some memoize stuff
-    setWidth: function setWidth () {
+    setWidth: function setWidth() {
       var firstRow = this.tbody.getElementsByTagName('TR')[0];
       var trh = this.thead.getElementsByTagName('TR')[0];
       var firstTds;
       var firstThs;
 
-      function setCellWidth (cell) {
+      function setCellWidth(cell) {
         cell.style.width = cell.offsetWidth + 'px';
       }
 
@@ -43,40 +44,52 @@
         [].forEach.call(firstThs, setCellWidth);
       }
     },
-    eventListener: function eventListener () {
+    eventListener: function eventListener() {
+      // var start = new Date().getTime();
+
       var offsetTop = getOffset(this.thead, 'offsetTop') - Number(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var classes = this.thead.className.split(' ');
 
-      if (this.stick !== true && (offsetTop - window.scrollY < 0)) {
+      if (this.stick !== true &&
+        (offsetTop - this.scrollParent.scrollTop < 0) &&
+        (offsetTop + this.tbody.offsetHeight - this.scrollParent.scrollTop > 0)) {
         this.stick = true;
         this.treshold = offsetTop;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
         this.thead.style.top = Number(this.headerHeight) + 'px';
-        setTimeout(function () {
+        setTimeout(function() {
           classes.push('lr-sticky-header');
           this.thead.style.position = 'fixed';
           this.thead.className = classes.join(' ');
+          this.element.style.marginTop = Number(this.thead.offsetHeight) + 'px';
         }.bind(this), 0);
       }
 
-      if (this.stick === true && (this.treshold - window.scrollY > 0)) {
+      if (this.stick === true && (
+          (this.treshold - this.scrollParent.scrollTop > 0) ||
+          (this.treshold + this.element.offsetHeight - this.scrollParent.scrollTop < 0)
+        )) {
         this.stick = false;
         this.thead.style.position = 'initial';
         classes.splice(classes.indexOf('lr-sticky-header'), 1);
         this.thead.className = (classes).join(' ');
+        this.element.style.marginTop = 0;
       }
+
+      // var end = new Date().getTime();
+      // var time = end - start;
+      // console.log('Execution time: ' + Number(time/1000) + ' sec');
     }
   };
 
-  return function lrStickyHeader (tableElement, options) {
-    var headerHeight = 0;
-    if (options&&options.headerHeight)
-      headerHeight=options.headerHeight;
-
-    var thead;
-    var tbody;
+  return function lrStickyHeader(tableElement, options) {
+    var headerHeight, scrollParent, thead, tbody;
+    if (options) {
+      headerHeight = options.headerHeight || 0,
+        scrollParent = options.scrollParent[0] || window;
+    }
 
     if (tableElement.tagName !== 'TABLE') {
       throw new Error('lrStickyHeader only works on table element');
@@ -97,31 +110,66 @@
 
 
     var stickyTable = Object.create(sticky, {
-      element: {value: tableElement},
+      element: { value: tableElement },
+      scrollParent: {
+        get: function() {
+          return scrollParent;
+        }
+      },
       headerHeight: {
-        get: function () {
+        get: function() {
           return headerHeight;
         }
       },
       thead: {
-        get: function () {
+        get: function() {
           return thead;
         }
       },
       tbody: {
-        get: function () {
+        get: function() {
           return tbody;
         }
       }
     });
 
     var listener = stickyTable.eventListener.bind(stickyTable);
-    window.addEventListener('scroll', listener);
-    stickyTable.clean = function clean () {
-      window.removeEventListener('scroll', listener);
+
+    scrollParent.addEventListener('scroll', listener);
+    stickyTable.clean = function clean() {
+      scrollParent.removeEventListener('scroll', listener);
     };
 
     return stickyTable;
   };
 });
 
+// USAGE EXAMPLE
+document.addEventListener('DOMContentLoaded', function() {
+
+  var tables = document.getElementsByClassName('table-stripped'),
+    scrollParent = '.scrollable'; // selector of scroll parent element
+
+  for (var i = 0, l = tables.length; i < l; i++) {
+    // !!!!!!!!!!!!!!!!!!!!!!!!
+    var $this = $(tables[i]); // Use jQuery for parents/childs quick check
+
+    // Exclude some tables
+    if (!$this.parents('.slick-slider').length &&
+      // Check for THEAD & TBODY exists
+      $this.children('thead').length == 1 &&
+      $this.children('tbody').length == 1 &&
+      // Only long tables
+      $this.children('tbody').children().length > 10) {
+
+      var $sp = $this.parents(scrollParent);
+      scrollParent = ($sp.length) ? $sp : window;
+
+      lrStickyHeader($this[0], {
+        headerHeight: 90,
+        scrollParent: scrollParent
+      });
+    }
+  }
+
+});

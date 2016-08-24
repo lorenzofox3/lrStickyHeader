@@ -46,15 +46,15 @@
     eventListener: function eventListener () {
       var offsetTop = getOffset(this.thead, 'offsetTop') - Number(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
-      var parentOffsetTop = getOffset(this.parent, 'offsetTop');
-      var parentScrollTop = parentOffsetTop + this.parent.scrollTop;
+      var parentOffsetTop = this.parentIsWindow ? 0 : getOffset(this.parent, 'offsetTop');
+      var parentScrollTop = this.parentIsWindow ? parent.scrollY : parentOffsetTop + this.parent.scrollTop;
       var classes = this.thead.className.split(' ');
 
       if (this.stick !== true && (offsetTop - parentScrollTop < 0) &&
           (offsetTop + this.tbody.offsetHeight - parentScrollTop > 0)) {
         this.stick = true;
         this.treshold = offsetTop;
-        this.windowScrollY = window.scrollY;
+        this.windowScrollY = this.parentIsWindow ? 0 : window.scrollY;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
         this.thead.style.top = Number(this.headerHeight + parentOffsetTop - this.windowScrollY) + 'px';
@@ -66,7 +66,7 @@
         }.bind(this), 0);
       }
 
-      if (this.stick === true && this.windowScrollY !== window.scrollY) {
+      if (this.stick === true && !this.parentIsWindow && this.windowScrollY !== window.scrollY) {
         this.windowScrollY = window.scrollY;
         this.thead.style.top = Number(this.headerHeight + parentOffsetTop - this.windowScrollY) + 'px';
       }
@@ -120,6 +120,7 @@
           return parent;
         }
       },
+      parentIsWindow: {value: parent === window},
       headerHeight: {
         get: function () {
           return headerHeight;

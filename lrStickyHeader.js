@@ -46,26 +46,39 @@
     eventListener: function eventListener () {
       var offsetTop = getOffset(this.thead, 'offsetTop') - Number(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
+      var parentOffsetTop = this.parentIsWindow ? 0 : getOffset(this.parent, 'offsetTop');
+      var parentScrollTop = this.parentIsWindow ? parent.scrollY : this.parent.scrollTop;
       var classes = this.thead.className.split(' ');
 
-      if (this.stick !== true && (offsetTop - window.scrollY < 0)) {
+      if (this.stick !== true && (offsetTop - (parentOffsetTop + parentScrollTop) < 0) &&
+          (offsetTop + this.tbody.offsetHeight - (parentOffsetTop + parentScrollTop) > 0)) {
         this.stick = true;
         this.treshold = offsetTop;
+        this.windowScrollY = this.parentIsWindow ? 0 : window.scrollY;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
-        this.thead.style.top = Number(this.headerHeight) + 'px';
+        this.thead.style.top = Number(this.headerHeight + parentOffsetTop - this.windowScrollY) + 'px';
         setTimeout(function () {
           classes.push('lr-sticky-header');
           this.thead.style.position = 'fixed';
           this.thead.className = classes.join(' ');
+          this.element.style.marginTop = Number(this.thead.offsetHeight) + 'px';
         }.bind(this), 0);
       }
 
-      if (this.stick === true && (this.treshold - window.scrollY > 0)) {
+      if (this.stick === true && !this.parentIsWindow && this.windowScrollY !== window.scrollY) {
+        this.windowScrollY = window.scrollY;
+        this.thead.style.top = Number(this.headerHeight + parentOffsetTop - this.windowScrollY) + 'px';
+      }
+
+      if (this.stick === true && (
+                 (this.parentIsWindow && (this.treshold - parentScrollTop > 0)) ||
+                 (parentScrollTop <= 0))) {
         this.stick = false;
         this.thead.style.position = 'initial';
         classes.splice(classes.indexOf('lr-sticky-header'), 1);
         this.thead.className = (classes).join(' ');
+        this.element.style.marginTop = '0';
       }
     }
   };
@@ -74,6 +87,10 @@
     var headerHeight = 0;
     if (options&&options.headerHeight)
       headerHeight=options.headerHeight;
+    var parent = window;
+    if (options && options.parent) {
+      parent = options.parent;
+    }
 
     var thead;
     var tbody;
@@ -98,6 +115,12 @@
 
     var stickyTable = Object.create(sticky, {
       element: {value: tableElement},
+      parent: {
+        get: function () {
+          return parent;
+        }
+      },
+      parentIsWindow: {value: parent === window},
       headerHeight: {
         get: function () {
           return headerHeight;
@@ -116,9 +139,15 @@
     });
 
     var listener = stickyTable.eventListener.bind(stickyTable);
-    window.addEventListener('scroll', listener);
+    parent.addEventListener('scroll', listener);
+    if (parent !== window) {
+      window.addEventListener('scroll', listener);
+    }
     stickyTable.clean = function clean () {
-      window.removeEventListener('scroll', listener);
+      parent.removeEventListener('scroll', listener);
+      if (parent !== window) {
+        window.removeEventListener('scroll', listener);
+      }
     };
 
     return stickyTable;

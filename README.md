@@ -27,6 +27,9 @@ None
 var tableElement = document.getElementById('table');
 
 var stickyTable = lrStickyHeader(tableElement);
+
+var parentElement = document.getElementById('scrollPanel');
+var stickyTable2 = lrStickyHeader(tableElement, {parent: parentElement});
 ```
 
 ### style

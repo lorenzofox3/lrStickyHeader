@@ -43,28 +43,4 @@ when the header is sticked the class name ``lr-sticky-header`` is added to the t
 *  **setWidth()** : if you want to call manually the resize of the column (within a resize event handler for example)
 *  **clean()** ~: to detach the scroll event handler from the window
 
-### example of a directive with [smart-table](http://lorenzofox3.github.io/smart-table-website/)
-
-```javascript
-  angular.directive('stStickyHeader', ['$window', function ($window) {
-    return {
-      require: '^?stTable',
-      link: function (scope, element, attr, ctrl) {
-        var stickyHeader = lrStickyHeader(element[0]);
-        scope.$on('$destroy', function () {
-          stickyHeader.clean();
-        });
-
-        scope.$watch(function () {
-          return ctrl.tableState();
-        }, function () {
-          $window.scrollTo(0, lrStickyHeader.treshold);
-        }, true)
-      }
-    }
-  }]);
-```
-
-
-
-
+### [example of a directive](https://github.com/lorenzofox3/stStickyHeader) with [smart-table](http://lorenzofox3.github.io/smart-table-website/)

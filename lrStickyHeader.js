@@ -53,7 +53,7 @@
       if (this.stick !== true && (offsetTop - (parentOffsetTop + parentScrollTop) < 0) &&
           (offsetTop + this.tbody.offsetHeight - (parentOffsetTop + parentScrollTop) > 0)) {
         this.stick = true;
-        this.treshold = offsetTop;
+        this.treshold = offsetTop - this.thead.clientHeight;
         this.windowScrollY = this.parentIsWindow ? 0 : window.scrollY;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';

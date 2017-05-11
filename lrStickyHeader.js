@@ -44,49 +44,52 @@
       }
     },
     eventListener: function eventListener () {
-      var offsetTop = getOffset(this.thead, 'offsetTop') - Number(this.headerHeight);
+      var offsetTop = getOffset(this.thead, 'offsetTop') - parseInt(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var parentOffsetTop = this.parentIsWindow ? 0 : getOffset(this.parent, 'offsetTop');
-      var parentScrollTop = this.parentIsWindow ? parent.scrollY : this.parent.scrollTop;
+      var parentScrollTop = this.parentIsWindow ? parent.pageYOffset : this.parent.scrollTop;
       var classes = this.thead.className.split(' ');
 
+      // For cross-browser compatibility and IE, use window.pageYOffset instead of window.scrollY
+      this.windowOffsetY = this.parentIsWindow ? 0 : window.pageYOffset;
+      var styleTop = parseInt(this.headerHeight) + parentOffsetTop - parseInt(this.windowOffsetY) + 'px';
+
       if (this.stick !== true && (offsetTop - (parentOffsetTop + parentScrollTop) < 0) &&
-          (offsetTop + this.tbody.offsetHeight - (parentOffsetTop + parentScrollTop) > 0)) {
+        (offsetTop + this.tbody.offsetHeight - (parentOffsetTop + parentScrollTop) > 0) && this.thead.style.top !== styleTop) {
         this.stick = true;
         this.treshold = offsetTop;
-        this.windowScrollY = this.parentIsWindow ? 0 : window.scrollY;
         this.setWidth();
         this.thead.style.left = offsetLeft + 'px';
-        this.thead.style.top = Number(this.headerHeight + parentOffsetTop - this.windowScrollY) + 'px';
+        this.thead.style.top = styleTop;
         setTimeout(function () {
           classes.push('lr-sticky-header');
           this.thead.style.position = 'fixed';
           this.thead.className = classes.join(' ');
-          this.element.style.marginTop = Number(this.thead.offsetHeight) + 'px';
+          this.element.style.marginTop = parseInt(this.thead.offsetHeight) + 'px';
         }.bind(this), 0);
       }
 
-      if (this.stick === true && !this.parentIsWindow && this.windowScrollY !== window.scrollY) {
-        this.windowScrollY = window.scrollY;
-        this.thead.style.top = Number(this.headerHeight + parentOffsetTop - this.windowScrollY) + 'px';
+      if (this.stick === true && !this.parentIsWindow && this.windowOffsetY !== window.pageYOffset && this.thead.style.top !== styleTop) {
+        this.thead.style.top = styleTop;
       }
 
-      if (this.stick === true && (
-                 (this.parentIsWindow && (this.treshold - parentScrollTop > 0)) ||
-                 (parentScrollTop <= 0))) {
-        this.stick = false;
-        this.thead.style.position = 'initial';
-        classes.splice(classes.indexOf('lr-sticky-header'), 1);
-        this.thead.className = (classes).join(' ');
-        this.element.style.marginTop = '0';
+      if (this.stick === true) {
+        if (this.parentIsWindow && this.treshold - parentScrollTop > 0 || parentScrollTop <= 0) {
+          this.stick = false;
+          this.thead.style.position = ''; // IE does not support 'initial'
+          this.thead.style.top = '';
+          this.element.style.marginTop = '';
+          classes.splice(classes.indexOf('lr-sticky-header'), 1);
+          this.thead.className = (classes).join(' ');
+        }
       }
     }
   };
 
   return function lrStickyHeader (tableElement, options) {
     var headerHeight = 0;
-    if (options&&options.headerHeight)
-      headerHeight=options.headerHeight;
+    if (options && options.headerHeight)
+      headerHeight = parseInt(options.headerHeight);
     var parent = window;
     if (options && options.parent) {
       parent = options.parent;

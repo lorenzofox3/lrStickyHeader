@@ -47,7 +47,7 @@
       var offsetTop = getOffset(this.thead, 'offsetTop') - parseInt(this.headerHeight);
       var offsetLeft = getOffset(this.thead, 'offsetLeft');
       var parentOffsetTop = this.parentIsWindow ? 0 : getOffset(this.parent, 'offsetTop');
-      var parentScrollTop = this.parentIsWindow ? parent.pageYOffset : this.parent.scrollTop;
+      var parentScrollTop = this.parentIsWindow ? this.parent.pageYOffset : this.parent.scrollTop;
       var classes = this.thead.className.split(' ');
 
       // For cross-browser compatibility and IE, use window.pageYOffset instead of window.scrollY
